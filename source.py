@@ -5,7 +5,7 @@ import matplotlib
 from matplotlib import pyplot 
 import yaml
 class Net(torch.nn.Module):
-        def __init__(self, activation_function):
+        def __init__(self, activation_function, net_structure):
             
             super(Net,self).__init__()
             
@@ -15,18 +15,40 @@ class Net(torch.nn.Module):
                 activation = torch.nn.Sigmoid()
             elif activation_function == 'Tanh':
                 activation = torch.nn.Tanh()
-                
-            self.model = torch.nn.Sequential(
-            torch.nn.Flatten(),  # 将输入的 28x28 图像展平成 784 维向量
-            torch.nn.Linear(784, 512),
-            activation,
-            torch.nn.Linear(512, 256),
-            activation,
-            torch.nn.Linear(256, 128),
-            activation,
-            torch.nn.Linear(128, 64),
-            activation,
-            torch.nn.Linear(64, 10),
+            if net_structure == 'FC':
+                self.model = torch.nn.Sequential(
+                torch.nn.Flatten(),  # 将输入的 28x28 图像展平成 784 维向量
+                torch.nn.Linear(784, 512),
+                activation,
+                torch.nn.Linear(512, 256),
+                activation,
+                torch.nn.Linear(256, 128),
+                activation,
+                torch.nn.Linear(128, 64),
+                activation,
+                torch.nn.Linear(64, 10),
+                torch.nn.Softmax(dim=1)
+            )
+            elif net_structure == "CNN":
+                self.model = torch.nn.Sequential(
+            #The size of the picture is 28x28
+            torch.nn.Conv2d(in_channels = 1,out_channels = 16,kernel_size = 3,stride = 1,padding = 1),
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(kernel_size = 2,stride = 2),
+            
+            #The size of the picture is 14x14
+            torch.nn.Conv2d(in_channels = 16,out_channels = 32,kernel_size = 3,stride = 1,padding = 1),
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(kernel_size = 2,stride = 2),
+            
+            #The size of the picture is 7x7
+            torch.nn.Conv2d(in_channels = 32,out_channels = 64,kernel_size = 3,stride = 1,padding = 1),
+            torch.nn.ReLU(),
+            
+            torch.nn.Flatten(),
+            torch.nn.Linear(in_features = 7 * 7 * 64,out_features = 128),
+            torch.nn.ReLU(),
+            torch.nn.Linear(in_features = 128,out_features = 10),
             torch.nn.Softmax(dim=1)
         )
         
@@ -46,13 +68,14 @@ def __main__():
     EPOCHS = config['EPOCHS']
     LEARNING_RATE = config['LEARNING_RATE']
     activation_function = config['ACTIVATION_FUNCTION']
+    net_structure = config['NET_STRUCTURE']
     trainData = torchvision.datasets.MNIST('./data/',train = True,transform = transform,download = True)
     testData = torchvision.datasets.MNIST('./data/',train = False,transform = transform)
 
 
     trainDataLoader = torch.utils.data.DataLoader(dataset = trainData,batch_size = BATCH_SIZE,shuffle = True)
     testDataLoader = torch.utils.data.DataLoader(dataset = testData,batch_size = BATCH_SIZE)
-    net = Net(activation_function)
+    net = Net(activation_function, net_structure)
     print(net.to(device))
 
     lossF = torch.nn.CrossEntropyLoss() 
