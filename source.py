@@ -1,8 +1,8 @@
 import torch
 import torchvision 
 from tqdm import tqdm
-import matplotlib
-from matplotlib import pyplot 
+import matplotlib.pyplot as plt
+
 import yaml
 class Net(torch.nn.Module):
         def __init__(self, activation_function, net_structure):
@@ -69,6 +69,7 @@ def __main__():
     LEARNING_RATE = config['LEARNING_RATE']
     activation_function = config['ACTIVATION_FUNCTION']
     net_structure = config['NET_STRUCTURE']
+    opti = config['OPTIMIZER']
     trainData = torchvision.datasets.MNIST('./data/',train = True,transform = transform,download = True)
     testData = torchvision.datasets.MNIST('./data/',train = False,transform = transform)
 
@@ -79,7 +80,12 @@ def __main__():
     print(net.to(device))
 
     lossF = torch.nn.CrossEntropyLoss() 
-    optimizer = torch.optim.Adam(net.parameters(), lr = LEARNING_RATE)
+    if opti == 'Adam':
+        optimizer = torch.optim.Adam(net.parameters(), lr = LEARNING_RATE)
+    elif opti == 'SGD':
+        optimizer = torch.optim.SGD(net.parameters(), lr = LEARNING_RATE)
+    elif opti == 'NAdam':
+        optimizer = torch.optim.NAdam(net.parameters(), lr=LEARNING_RATE)
 
     history = {'Test Loss': [], 'Test Accuracy': []}
     for epoch in range(1, EPOCHS + 1):
@@ -123,22 +129,26 @@ def __main__():
                                         (epoch, EPOCHS, loss.item(), accuracy.item(), testLoss.item(), testAccuracy.item()))
         processBar.close()
     
+    print("Training complete, plotting graphs...")
+    print(f"history:", history)
+    plt.plot(history['Test Loss'],label = 'Test Loss')
+    plt.legend(loc='best')
+    plt.grid(True)
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.savefig('test_loss.png')
+    plt.close()
 
-    pyplot.plot(history['Test Loss'],label = 'Test Loss')
-    pyplot.legend(loc='best')
-    pyplot.grid(True)
-    pyplot.xlabel('Epoch')
-    pyplot.ylabel('Loss')
-    pyplot.show()
+    plt.plot(history['Test Accuracy'],color = 'red',label = 'Test Accuracy')
+    plt.legend(loc='best')
+    plt.grid(True)
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.show()
+    plt.savefig('test_accuracy.png')
+    plt.close()
 
-    pyplot.plot(history['Test Accuracy'],color = 'red',label = 'Test Accuracy')
-    pyplot.legend(loc='best')
-    pyplot.grid(True)
-    pyplot.xlabel('Epoch')
-    pyplot.ylabel('Accuracy')
-    pyplot.show()
-
-    torch.save(net,'./model.pth')
+    #torch.save(net,'./model.pth')
 
 if __name__ == "__main__":
     __main__()

@@ -35,6 +35,7 @@ EPOCHS: 10
 LEARNING_RATE: 0.0001
 ACTIVATION_FUNCTION: 'ReLU' # 'ReLU' or 'Sigmoid' or 'Tanh'
 NET_STRUCTURE: 'FC' # 'CNN' or 'FC'
+OPTIMIZER: Adadelta # 'Adam' or 'SGD' or 'Adadelta'
 ```
 
 * `BATCH_SIZE`: control the number of samples processed before the model's internal parameters are updated.
@@ -42,6 +43,7 @@ NET_STRUCTURE: 'FC' # 'CNN' or 'FC'
 * `LEARNING_RATE`: controls the speed at which a model's weights are updated during training.
 * `ACTIVATION_FUCTION`: controls the output of a neural network node by introducing non-linearity.
 * `NET_STRUCTURE`:define the deeplearning structure you want to use.
+* `OPTIMIZER`:adjusts model parameters to minimize the loss function and improve model performance.
 
 ## Run
 
