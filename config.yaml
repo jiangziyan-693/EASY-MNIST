@@ -3,4 +3,4 @@ EPOCHS: 10
 LEARNING_RATE: 0.001
 ACTIVATION_FUNCTION: 'ReLU' # 'ReLU' or 'Sigmoid' or 'Tanh'
 NET_STRUCTURE: 'FC' # 'CNN' or 'FC'
-OPTIMIZER: NAdam # 'Adam' or 'SGD' or 'NAdam'
+OPTIMIZER: 'NAdam' # 'Adam' or 'SGD' or 'NAdam'
